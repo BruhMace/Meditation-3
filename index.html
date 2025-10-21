@@ -1,0 +1,102 @@
+<h1>Meditation #3</h1>
+<h2>by Maceo</h2>
+
+
+<body style="background: white"></body>
+<script src="https://cdn.jsdelivr.net/gh/netizenorg/netnet-standard-library/build/nn.min.js"></script>
+<script src="https://unpkg.com/tone"></script>
+<script src="https://algorithmicmusic.online/js/viz-helpers.js"></script>
+<script>
+    
+/* global nn, Tone, viz */
+
+const player = new Tone.Player('talk.mp3')
+player.toDestination()
+
+const gainNode = new Tone.Gain(0.75).toDestination()
+const osc = new Tone.Oscillator({
+  frequency: 440,
+  type: 'sine'
+}).connect(gainNode)
+  
+//Start and stop functions
+function start () {
+  player.start()
+}
+  
+function stop () {
+  player.stop()
+}
+// Stop and start buttons
+nn.create('button')
+  .content('Start')
+  .addTo('body')
+  .on('click', start) 
+  
+nn.create('button')
+  .content('Stop')
+  .addTo('body')
+  .on('click', stop) 
+
+//Visualization
+  
+const wave = viz.createWaveform()
+player.connect(wave)
+  
+//Functions for moods
+
+function happy() {
+  player.playbackRate = 1.4
+  const HappyChorus = new Tone.Chorus(4, 2.5, 0.5).start().toDestination()
+  player.disconnect()
+  player.connect(HappyChorus)
+  player.connect(wave)
+}
+
+function sad() {
+  player.playbackRate = 0.6
+  
+}
+
+function evil() {
+  player.playbackRate = 0.8
+  
+}
+  
+function original() {
+  player.disconnect()
+  player.playbackRate = 1.0
+  player.toDestination()
+  player.connect(wave)
+  
+}
+
+// Buttons to change mood preset
+nn.create('button')
+  .content('Happy')
+  .addTo('body')
+  .on('click', () => document.body.style.background = 'linear-gradient(to right, orange, yellow)')
+  .on('click', () => happy())
+  
+  
+nn.create('button')
+  .content('Sad')
+  .addTo('body')
+  .on('click', () => document.body.style.background = 'linear-gradient(to right, blue, purple)')
+  .on('click', () => sad())
+
+nn.create('button')
+  .content('Evil')
+  .addTo('body')
+  .on('click', () => document.body.style.background = 'linear-gradient(to right, red, black)')
+  .on('click', () => evil())
+  
+nn.create('button')
+  .content('Original')
+  .addTo('body')
+  .on('click', () => document.body.style.background = 'white')
+  .on('click', () => original())
+  
+
+
+</script>
