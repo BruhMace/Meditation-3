@@ -13,12 +13,7 @@
 const player = new Tone.Player('talk.mp3')
 player.toDestination()
 
-const gainNode = new Tone.Gain(0.75).toDestination()
-const osc = new Tone.Oscillator({
-  frequency: 440,
-  type: 'sine'
-}).connect(gainNode)
-  
+
 //Start and stop functions
 function start () {
   player.start()
@@ -39,28 +34,45 @@ nn.create('button')
   .on('click', stop) 
 
 //Visualization
-  
 const wave = viz.createWaveform()
 player.connect(wave)
   
 //Functions for moods
 
 function happy() {
-  player.playbackRate = 1.4
-  const HappyChorus = new Tone.Chorus(4, 2.5, 0.5).start().toDestination()
+  player.playbackRate = 1.25
+  const chorus = new Tone.Chorus(4, 2.5, 0.5).start().toDestination()
+  const reverb = new Tone.Freeverb({ roomSize: 0.6, dampening: 2000 })
+  const autoFilter = new Tone.AutoFilter("8n").start()
   player.disconnect()
-  player.connect(HappyChorus)
+  player.connect(chorus)
+  chorus.connect(reverb)
+  reverb.connect(autoFilter)
+  autoFilter.toDestination()
   player.connect(wave)
 }
 
 function sad() {
   player.playbackRate = 0.6
-  
+  const reverb = new Tone.Freeverb({ roomSize: 0.9, dampening: 500 })
+  const delay = new Tone.FeedbackDelay("8n", 0.4)
+  const filter = new Tone.Filter(400, "lowpass")
+  player.connect(reverb)
+  reverb.connect(delay)
+  delay.connect(filter)
+  filter.toDestination()
+  player.connect(wave)
 }
 
 function evil() {
   player.playbackRate = 0.8
-  
+  const distortion = new Tone.Distortion(0.6)
+  const tremolo = new Tone.Tremolo(5, 0.7).start()
+  const bitcrusher = new Tone.BitCrusher(4)
+  player.connect(distortion)
+  distortion.connect(bitcrusher)
+  bitcrusher.connect(tremolo)
+  tremolo.toDestination()
 }
   
 function original() {
@@ -68,7 +80,6 @@ function original() {
   player.playbackRate = 1.0
   player.toDestination()
   player.connect(wave)
-  
 }
 
 // Buttons to change mood preset
@@ -77,7 +88,6 @@ nn.create('button')
   .addTo('body')
   .on('click', () => document.body.style.background = 'linear-gradient(to right, orange, yellow)')
   .on('click', () => happy())
-  
   
 nn.create('button')
   .content('Sad')
@@ -97,6 +107,4 @@ nn.create('button')
   .on('click', () => document.body.style.background = 'white')
   .on('click', () => original())
   
-
-
 </script>
